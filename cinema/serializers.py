@@ -31,31 +31,9 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    genres = serializers.SlugRelatedField(
-        many=True,
-        slug_field="name",
-        read_only=True
-    )
-    actors = serializers.SlugRelatedField(
-        many=True,
-        slug_field="full_name",
-        read_only=True
-    )
-    # genres = GenreSerializer(many=True, read_only=False)
-    # actors = ActorSerializer(many=True, read_only=False)
-
     class Meta:
         model = Movie
         fields = ("id", "title", "description", "duration", "genres", "actors")
-
-    def validate(self, attrs):
-        if "actors" in attrs:
-            if not all(isinstance(actor_id, int)
-                       for actor_id in attrs["actors"]):
-                raise serializers.ValidationError(
-                    "Actors must be a list of integers (primary keys)."
-                )
-        return attrs
 
 
 class MovieListSerializer(MovieSerializer):
@@ -104,7 +82,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         )
 
 
-class TicketSerializer(serializers.Serializer):
+class TicketSerializer(serializers.ModelSerializer):
     row = serializers.IntegerField()
     seat = serializers.IntegerField()
 
@@ -127,7 +105,7 @@ class MovieSessionDetailSerializer(MovieSessionSerializer):
         fields = ("id", "show_time", "movie", "cinema_hall", "taken_places")
 
 
-class TicketListSerializer(serializers.Serializer):
+class TicketListSerializer(serializers.ModelSerializer):
     movie_session = MovieSessionListSerializer(many=False, read_only=True)
     row = serializers.IntegerField()
     seat = serializers.IntegerField()
